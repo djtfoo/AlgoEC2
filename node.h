@@ -1,10 +1,15 @@
-#pragma once
+#ifndef NODE_H_INCLUDED
+#define NODE_H_INCLUDED
+
+//#include <string>
 
 struct node
 {
     int key;
     char* value;
     node* next;
+
+    node(int key, char* value) : key(key), value(value), next(0) {}
 };
 
 /*class linked_list
@@ -18,3 +23,5 @@ public:
         tail = NULL;
     }
 };*/
+
+#endif  // NODE_H_INCLUDED
