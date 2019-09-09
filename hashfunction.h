@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-namespace hash_function {
+namespace hash {
 
     static int division_method(int key, int tableSize) {
         std::cout<< "Division Method" << std::endl;

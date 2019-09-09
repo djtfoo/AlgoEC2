@@ -3,12 +3,13 @@
 
 using std::cout;
 using std::endl;
+using hash::hash_table;
 
+// initialize tableSize and hashFunction
 hash_table::hash_table(int tableSize, int(*func)(int,int)) : tableSize(tableSize), hashfunc(func) {
-    buckets = new node*[tableSize]();
-    for (int i = 0; i < tableSize; ++i) {
-        buckets[i] = NULL;
-    }
+
+    // create dynamic array of node pointers (slots in the hash table)
+    buckets = new node*[tableSize]();   // create an array of node pointers; () sets every pointer to null
 }
 
 hash_table::~hash_table() {

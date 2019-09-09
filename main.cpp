@@ -4,10 +4,11 @@
 
 using std::cout;
 using std::endl;
+using namespace hash;
 
 int main()
 {
-    hash_table hashtable(5, hash_function::division_method);
+    hash_table hashtable(5, hash::division_method);
     cout << hashtable.insert_element(7, "500") << endl;    // prints 1
     cout << hashtable.insert_element(2, "500") << endl;    // prints 1, but there will be collision in the hash table's slots
     cout << hashtable.insert_element(7, "555") << endl;    // prints 0; duplicate key

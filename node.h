@@ -3,14 +3,17 @@
 
 //#include <string>
 
-struct node
-{
-    int key;
-    char* value;
-    node* next;
+// node of a hash table
+namespace hash {
+    struct node
+    {
+        int key;
+        char* value;
+        node* next;
 
-    node(int key, char* value) : key(key), value(value), next(0) {}
-};
+        node(int key, char* value) : key(key), value(value), next(0) {}
+    };
+}
 
 /*class linked_list
 {
