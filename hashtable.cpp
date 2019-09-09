@@ -20,7 +20,7 @@ hash_table::~hash_table() {
         while (buckets[i] != NULL) {
             node *temp = buckets[i];
             buckets[i] = buckets[i]->next;
-            cout << "Deleting key " << temp->key << endl;
+            //cout << "Deleting key " << temp->key << endl;
             delete temp;
         }
     }
@@ -28,13 +28,13 @@ hash_table::~hash_table() {
     delete[] buckets;
 }
 
-bool hash_table::insert_element(int key, char* value) {
+bool hash_table::insert_element(int key, std::string value) {
 
     int hashedKey = hashfunc(key, tableSize);
     if (hashedKey >= tableSize)   // hash function failed
     {
         cout << "FUck, our hash function failed" << endl;
-        return false;   // failed to insert
+        return false;   // invalid key; failed to insert
     }
 
     if (buckets[hashedKey] == NULL) {   // no collision
@@ -55,17 +55,17 @@ bool hash_table::insert_element(int key, char* value) {
     }
 }
 
-char* hash_table::get_value(int key) {
+std::string hash_table::get_value(int key) {
 
     int hashedKey = hashfunc(key, tableSize);
     if (hashedKey >= tableSize)   // hash function failed
     {
         cout << "FUck, our hash function failed" << endl;
-        return false;   // failed to insert
+        return "";   // invalid key
     }
 
     if (buckets[hashedKey] == NULL) {   // key not found
-        return NULL;
+        return "";  // key not found
     }
     else {  // collision; check nodes in bucket
         node* ptr = buckets[hashedKey];
@@ -74,21 +74,47 @@ char* hash_table::get_value(int key) {
                 return ptr->value;
             ptr = ptr->next;
         } while (ptr != NULL);
-        return NULL;    // not found in the collision linked list
+        return "";    // not found in the collision linked list
     }
 }
 
-char* hash_table::set_value(int key, char* newValue) {
+// number of key comparisons made to find the key. if key not found, return -1
+int hash_table::find_key(int key) {
 
     int hashedKey = hashfunc(key, tableSize);
     if (hashedKey >= tableSize)   // hash function failed
     {
         cout << "FUck, our hash function failed" << endl;
-        return false;   // failed to insert
+        return -1;   // invalid key
     }
 
     if (buckets[hashedKey] == NULL) {   // key not found
-        return NULL;
+        return -1;  // key not found
+    }
+    else {  // collision; check nodes in bucket
+        int keyComp = 0;
+        node* ptr = buckets[hashedKey];
+        do {
+            ++keyComp;
+            if (ptr->key == key)    // key already exists
+                return keyComp;
+            ptr = ptr->next;
+        } while (ptr != NULL);
+        return -1;    // not found in the collision linked list
+    }
+}
+
+bool hash_table::set_value(int key, std::string newValue) {
+
+    int hashedKey = hashfunc(key, tableSize);
+    if (hashedKey >= tableSize)   // hash function failed
+    {
+        cout << "FUck, our hash function failed" << endl;
+        return false;   // invalid key; failed to set value
+    }
+
+    if (buckets[hashedKey] == NULL) {   // key not found
+        return false;   // key does not exist; failed to set value
     }
     else {  // collision; check nodes in bucket
         node* ptr = buckets[hashedKey];
@@ -96,10 +122,10 @@ char* hash_table::set_value(int key, char* newValue) {
             if (ptr->key == key)    // key already exists
             {
                 ptr->value = newValue;
-                return ptr->value;
+                return true;
             }
             ptr = ptr->next;
         } while (ptr != NULL);
-        return NULL;    // not found in the collision linked list
+        return false;   // key not found in the collision linked list
     }
 }

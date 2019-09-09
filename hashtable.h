@@ -15,9 +15,10 @@ namespace hash {
         hash_table(int bucketsSize, int(*func)(int,int) = hash::division_method);   // constructor
         virtual ~hash_table();  // destructor
 
-        bool insert_element(int key, char* value);  // insert key into hash table if it does not exist
-        char* get_value(int key);   // get value corresponding to key
-        char* set_value(int key, char* newValue);   // set new value corresponding to key
+        bool insert_element(int key, std::string value);    // insert key into hash table if it does not exist
+        int find_key(int key);  // number of key comparisons made to find the key. if key not found, return -1
+        std::string get_value(int key); // get value corresponding to key; use only when certain that key exists
+        bool set_value(int key, std::string newValue);  // set new value corresponding to key
     };
 }
 
