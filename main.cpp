@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>  // stringstream
 #include <cstdlib>
+#include <windows.h>
 
 #include <bits/stdc++.h>    // for getting clock/time
 
@@ -15,6 +16,7 @@ using std::string;
 using namespace hash;
 
 // function prototypes
+void test_search(hash_table&, int);
 void test_codes();
 void read_csv_data(hash_table&);
 
@@ -24,22 +26,91 @@ int main()
     //test_codes();   // test codes for testing out the hash table
 
     // ==== ACTUAL APPLICATION ====
+    int nLoadFactor25 = 485587;
+    int nLoadFactor50 = 242797;
+    int nLoadFactor75 = 161869;
+    int nLoadFactor100 = 121403;
+    int nLoadFactor200 = 60703;
+
     // create hash table
-    int n = 500000;
-    hash_table hashtable(n, hash::division_method);
+    hash_table hashtable_division25(nLoadFactor25, hash::division_method);
     // read dataset into hash table
-    read_csv_data(hashtable);   // read CSV file containing dataset into hash table
+    read_csv_data(hashtable_division25);   // read CSV file containing dataset into hash table
 
-    // search/test codes here
-    clock_t start, end;
-    start = clock();
-    cout << "Key: 545530                Value   : " << hashtable.get_value(545530) << endl;   // 16C YIO CHU KANG ROAD SINGAPORE 545530
-    cout << "Key: 545530  Key Comparisons Made  : " << hashtable.find_key(545530) << endl; // 1, as n > dataset size
-    end = clock();
+    hash_table hashtable_division50(nLoadFactor50, hash::division_method);
+    read_csv_data(hashtable_division50);
 
-    cout << "Number of clock ticks: " << end - start << endl;
+    hash_table hashtable_division75(nLoadFactor75, hash::division_method);
+    read_csv_data(hashtable_division75);
+
+    hash_table hashtable_mcm25(nLoadFactor25, hash::multiplicative_congruential_method);
+    read_csv_data(hashtable_mcm25);
+
+    hash_table hashtable_mcm50(nLoadFactor50, hash::multiplicative_congruential_method);
+    read_csv_data(hashtable_mcm50);
+
+    hash_table hashtable_mcm75(nLoadFactor75, hash::multiplicative_congruential_method);
+    read_csv_data(hashtable_mcm75);
+
+    cout << "=== DIVISION METHOD | LOAD FACTOR 0.25 | SUCCESSFUL SEARCH ===" << endl;
+    test_search(hashtable_division25, 545530);
+
+    cout << "=== DIVISION METHOD | LOAD FACTOR 0.25 | UNSUCCESSFUL SEARCH ===" << endl;
+    test_search(hashtable_division25, 418526);
+
+    cout << "=== DIVISION METHOD | LOAD FACTOR 0.50 | SUCCESSFUL SEARCH ===" << endl;
+    test_search(hashtable_division50, 545530);
+
+    cout << "=== DIVISION METHOD | LOAD FACTOR 0.50 | UNSUCCESSFUL SEARCH ===" << endl;
+    test_search(hashtable_division50, 418526);
+
+    cout << "=== DIVISION METHOD | LOAD FACTOR 0.75 | SUCCESSFUL SEARCH ===" << endl;
+    test_search(hashtable_division75, 545530);
+
+    cout << "=== DIVISION METHOD | LOAD FACTOR 0.75 | UNSUCCESSFUL SEARCH ===" << endl;
+    test_search(hashtable_division75, 418526);
+
+    cout << "=== MULTIPLICATIVE CONGRUENTIAL METHOD | LOAD FACTOR 0.25 | SUCCESSFUL SEARCH ===" << endl;
+    test_search(hashtable_mcm25, 545530);
+
+    cout << "=== MULTIPLICATIVE CONGRUENTIAL METHOD | LOAD FACTOR 0.25 | UNSUCCESSFUL SEARCH ===" << endl;
+    test_search(hashtable_mcm25, 418526);
+
+    cout << "=== MULTIPLICATIVE CONGRUENTIAL METHOD | LOAD FACTOR 0.50 | SUCCESSFUL SEARCH ===" << endl;
+    test_search(hashtable_mcm50, 545530);
+
+    cout << "=== MULTIPLICATIVE CONGRUENTIAL METHOD | LOAD FACTOR 0.50 | UNSUCCESSFUL SEARCH ===" << endl;
+    test_search(hashtable_mcm50, 418526);
+
+    cout << "=== MULTIPLICATIVE CONGRUENTIAL METHOD | LOAD FACTOR 0.75 | SUCCESSFUL SEARCH ===" << endl;
+    test_search(hashtable_mcm75, 545530);
+
+    cout << "=== MULTIPLICATIVE CONGRUENTIAL METHOD | LOAD FACTOR 0.75 | UNSUCCESSFUL SEARCH ===" << endl;
+    test_search(hashtable_mcm75, 418526);
 
     return 0;
+}
+
+void test_search(hash_table& hashtable, int key) {
+    LARGE_INTEGER freq, start, end;
+
+    QueryPerformanceFrequency(&freq);
+
+    int iterations = 10000;
+    double time_taken = 0;
+
+    // get average runtime out of 10000 iterations
+    for (int i = 0; i < iterations; i++) {
+        QueryPerformanceCounter(&start);
+        hashtable.get_value(key);
+//        hashtable.find_key(key);
+//        cout << "Key: " << key << endl;
+//        cout << "Value: " << hashtable.get_value(key) << endl;
+//        cout << "Key Comparisons Made: " << hashtable.find_key(key) << endl;
+        QueryPerformanceCounter(&end);
+        time_taken += (double) (end.QuadPart - start.QuadPart) / freq.QuadPart;
+    }
+    cout << "Average runtime in microseconds: " << time_taken*1000000/iterations << endl << endl;
 }
 
 void test_codes() {
