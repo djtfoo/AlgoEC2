@@ -2,6 +2,7 @@
 #define HASHFUNCTION_H_INCLUDED
 
 #include <iostream>
+#include <math.h>
 
 namespace hash {
 
@@ -15,7 +16,8 @@ namespace hash {
     }
     static int multiplicative_congruential_method(int key, int tableSize) {
         //std::cout<< "Multiplicative Congruential Method" << std::endl;
-        return key;
+        double multiplier = (sqrt(5) - 1)/2;  // reciprocal golden ratio
+        return tableSize * (key*multiplier - floor(key*multiplier));
     }
 }
 
