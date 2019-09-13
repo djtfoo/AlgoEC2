@@ -9,6 +9,7 @@
 
 #include "hashtable.h"
 #include "hashfunction.h"
+#include "hashtableprinter.h"
 
 using std::cout;
 using std::endl;
@@ -18,7 +19,21 @@ using namespace hash;
 // function prototypes
 void test_search(hash_table&, int);
 void test_codes();
+
+
 void read_csv_data(hash_table&);
+void test_by_load_factor(int, const char*, hash_table*);
+void create_hashtables();
+
+//const int numRecords = 121397;
+
+#define NUM_HF 3    // number of hash functions
+
+const string hf_names[NUM_HF] = {
+    "Division Method",
+    "Folding Method",
+    "Multiplicative Congruential Method"
+};
 
 int main()
 {
@@ -32,63 +47,71 @@ int main()
     int nLoadFactor100 = 121403;
     int nLoadFactor200 = 60703;
 
-    // create hash table
-    hash_table hashtable_division25(nLoadFactor25, hash::division_method);
-    // read dataset into hash table
-    read_csv_data(hashtable_division25);   // read CSV file containing dataset into hash table
+    // Create hash tables
+    hash_table hashTLoadFactor25[NUM_HF] = { hash_table(nLoadFactor25, hash::division_method),
+        hash_table(nLoadFactor25, hash::folding_method),
+        hash_table(nLoadFactor25, hash::multiplicative_congruential_method)
+    };
+    hash_table hashTLoadFactor50[NUM_HF] = { hash_table(nLoadFactor50, hash::division_method),
+        hash_table(nLoadFactor50, hash::folding_method),
+        hash_table(nLoadFactor50, hash::multiplicative_congruential_method)
+    };
+    hash_table hashTLoadFactor75[NUM_HF] = { hash_table(nLoadFactor75, hash::division_method),
+        hash_table(nLoadFactor75, hash::folding_method),
+        hash_table(nLoadFactor75, hash::multiplicative_congruential_method)
+    };
+    for (int i = 0; i < NUM_HF; ++i) {
+        read_csv_data(hashTLoadFactor25[i]);
+        read_csv_data(hashTLoadFactor50[i]);
+        read_csv_data(hashTLoadFactor75[i]);
+    }
 
-    hash_table hashtable_division50(nLoadFactor50, hash::division_method);
-    read_csv_data(hashtable_division50);
+    // function loop
+    cout << "== CLOSED ADDRESS HASHING COMPARISON PROGRAM ==" << endl;
+    int choice;
+    do {
+        cout << "(1) LOAD FACTOR 0.25" << endl
+            << "(2) LOAD FACTOR 0.5" << endl
+            << "(3) LOAD FACTOR 0.75" << endl
+            << "(4) QUIT" << endl
+            << "Enter option: ";
+        scanf("%d", &choice);
 
-    hash_table hashtable_division75(nLoadFactor75, hash::division_method);
-    read_csv_data(hashtable_division75);
+        switch (choice) {
+        case 1: test_by_load_factor(nLoadFactor25, "0.25", hashTLoadFactor25);
+            break;
+        case 2: test_by_load_factor(nLoadFactor50, "0.5", hashTLoadFactor50);
+            break;
+        case 3: test_by_load_factor(nLoadFactor75, "0.75", hashTLoadFactor75);
+            break;
+        case 4:
+            break;
+        default:
+            cout << "Invalid option" << endl;
+            break;
+        }
 
-    hash_table hashtable_mcm25(nLoadFactor25, hash::multiplicative_congruential_method);
-    read_csv_data(hashtable_mcm25);
-
-    hash_table hashtable_mcm50(nLoadFactor50, hash::multiplicative_congruential_method);
-    read_csv_data(hashtable_mcm50);
-
-    hash_table hashtable_mcm75(nLoadFactor75, hash::multiplicative_congruential_method);
-    read_csv_data(hashtable_mcm75);
-
-    cout << "=== DIVISION METHOD | LOAD FACTOR 0.25 | SUCCESSFUL SEARCH ===" << endl;
-    test_search(hashtable_division25, 545530);
-
-    cout << "=== DIVISION METHOD | LOAD FACTOR 0.25 | UNSUCCESSFUL SEARCH ===" << endl;
-    test_search(hashtable_division25, 418526);
-
-    cout << "=== DIVISION METHOD | LOAD FACTOR 0.50 | SUCCESSFUL SEARCH ===" << endl;
-    test_search(hashtable_division50, 545530);
-
-    cout << "=== DIVISION METHOD | LOAD FACTOR 0.50 | UNSUCCESSFUL SEARCH ===" << endl;
-    test_search(hashtable_division50, 418526);
-
-    cout << "=== DIVISION METHOD | LOAD FACTOR 0.75 | SUCCESSFUL SEARCH ===" << endl;
-    test_search(hashtable_division75, 545530);
-
-    cout << "=== DIVISION METHOD | LOAD FACTOR 0.75 | UNSUCCESSFUL SEARCH ===" << endl;
-    test_search(hashtable_division75, 418526);
-
-    cout << "=== MULTIPLICATIVE CONGRUENTIAL METHOD | LOAD FACTOR 0.25 | SUCCESSFUL SEARCH ===" << endl;
-    test_search(hashtable_mcm25, 545530);
-
-    cout << "=== MULTIPLICATIVE CONGRUENTIAL METHOD | LOAD FACTOR 0.25 | UNSUCCESSFUL SEARCH ===" << endl;
-    test_search(hashtable_mcm25, 418526);
-
-    cout << "=== MULTIPLICATIVE CONGRUENTIAL METHOD | LOAD FACTOR 0.50 | SUCCESSFUL SEARCH ===" << endl;
-    test_search(hashtable_mcm50, 545530);
-
-    cout << "=== MULTIPLICATIVE CONGRUENTIAL METHOD | LOAD FACTOR 0.50 | UNSUCCESSFUL SEARCH ===" << endl;
-    test_search(hashtable_mcm50, 418526);
-
-    cout << "=== MULTIPLICATIVE CONGRUENTIAL METHOD | LOAD FACTOR 0.75 | SUCCESSFUL SEARCH ===" << endl;
-    test_search(hashtable_mcm75, 545530);
-
-    cout << "=== MULTIPLICATIVE CONGRUENTIAL METHOD | LOAD FACTOR 0.75 | UNSUCCESSFUL SEARCH ===" << endl;
-    test_search(hashtable_mcm75, 418526);
+    } while (choice != 4);
 
     return 0;
+}
+
+void test_by_load_factor(int slots, const char* loadfactor, hash_table* hashtables) {
+
+    cout << "Load Factor : " << loadfactor << " | No. of slots : " << slots << endl;
+    cout << "==== Key Distribution ====" << endl;
+    for (int i = 0; i < NUM_HF; ++i) {
+        cout << ">> " << hf_names[i] << endl;
+        hash_table_printer::printKeyDistribution(hashtables[i]);
+    }
+
+    cout << "==== Average CPU Time ====" << endl;
+    int key = 418526;
+    cout << "Key Search : " << key << endl;
+    for (int i = 0; i < NUM_HF; ++i) {
+        cout << ">> " << hf_names[i] << endl;
+        test_search(hashtables[i], key);
+    }
 }
 
 void test_search(hash_table& hashtable, int key) {

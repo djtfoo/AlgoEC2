@@ -1,5 +1,6 @@
 #include "hashtable.h"
 #include <iostream>
+#include <map>
 
 using std::cout;
 using std::endl;
@@ -33,7 +34,7 @@ bool hash_table::insert_element(int key, std::string value) {
     int hashedKey = hashfunc(key, tableSize);
     if (hashedKey >= tableSize)   // hash function failed
     {
-        cout << "FUck, our hash function failed" << endl;
+        cout << "hash function failed" << endl;
         return false;   // invalid key; failed to insert
     }
 
@@ -60,7 +61,7 @@ std::string hash_table::get_value(int key) {
     int hashedKey = hashfunc(key, tableSize);
     if (hashedKey >= tableSize)   // hash function failed
     {
-        cout << "FUck, our hash function failed" << endl;
+        cout << "hash function failed" << endl;
         return "";   // invalid key
     }
 
@@ -84,7 +85,7 @@ int hash_table::find_key(int key) {
     int hashedKey = hashfunc(key, tableSize);
     if (hashedKey >= tableSize)   // hash function failed
     {
-        cout << "FUck, our hash function failed" << endl;
+        cout << "hash function failed" << endl;
         return -1;   // invalid key
     }
 
@@ -109,7 +110,7 @@ bool hash_table::set_value(int key, std::string newValue) {
     int hashedKey = hashfunc(key, tableSize);
     if (hashedKey >= tableSize)   // hash function failed
     {
-        cout << "FUck, our hash function failed" << endl;
+        cout << "hash function failed" << endl;
         return false;   // invalid key; failed to set value
     }
 
