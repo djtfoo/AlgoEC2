@@ -31,7 +31,7 @@ void create_hashtables();
 
 const string hf_names[NUM_HF] = {
     "Division Method",
-    "Folding Method",
+    "Mid-Square Method",
     "Multiplicative Congruential Method"
 };
 
@@ -49,15 +49,15 @@ int main()
 
     // Create hash tables
     hash_table hashTLoadFactor25[NUM_HF] = { hash_table(nLoadFactor25, hash::division_method),
-        hash_table(nLoadFactor25, hash::folding_method),
+        hash_table(nLoadFactor25, hash::mid_square_method),
         hash_table(nLoadFactor25, hash::multiplicative_congruential_method)
     };
     hash_table hashTLoadFactor50[NUM_HF] = { hash_table(nLoadFactor50, hash::division_method),
-        hash_table(nLoadFactor50, hash::folding_method),
+        hash_table(nLoadFactor50, hash::mid_square_method),
         hash_table(nLoadFactor50, hash::multiplicative_congruential_method)
     };
     hash_table hashTLoadFactor75[NUM_HF] = { hash_table(nLoadFactor75, hash::division_method),
-        hash_table(nLoadFactor75, hash::folding_method),
+        hash_table(nLoadFactor75, hash::mid_square_method),
         hash_table(nLoadFactor75, hash::multiplicative_congruential_method)
     };
     for (int i = 0; i < NUM_HF; ++i) {

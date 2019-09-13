@@ -10,15 +10,10 @@ namespace hash {
         //std::cout<< "Division Method" << std::endl;
         return key % tableSize;
     }
-    static int folding_method(int key, int tableSize) {
+    static int mid_square_method(int key, int tableSize) {
         //std::cout<< "Folding Method" << std::endl;
-        int n1 = (key%10)*10 + (key%100)/10;
-        key /= 100;
-        int n2 = (key%10)*10 + (key%100)/10;
-        key /= 100;
-        int n3 = (key%10)*10 + (key%100)/10;
-
-        return (n1*n2*n3) % tableSize;
+        unsigned long long keySquared = key * key / 1000;
+        return (keySquared % 1000000) % tableSize;
     }
     static int multiplicative_congruential_method(int key, int tableSize) {
         //std::cout<< "Multiplicative Congruential Method" << std::endl;
