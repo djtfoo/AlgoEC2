@@ -12,7 +12,13 @@ namespace hash {
     }
     static int folding_method(int key, int tableSize) {
         //std::cout<< "Folding Method" << std::endl;
-        return key;
+        int n1 = (key%10)*10 + (key%100)/10;
+        key /= 100;
+        int n2 = (key%10)*10 + (key%100)/10;
+        key /= 100;
+        int n3 = (key%10)*10 + (key%100)/10;
+
+        return (n1*n2*n3) % tableSize;
     }
     static int multiplicative_congruential_method(int key, int tableSize) {
         //std::cout<< "Multiplicative Congruential Method" << std::endl;
