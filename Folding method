@@ -1,0 +1,7 @@
+Pseudo code for folding method hash function
+
+divide the key into equal partitions of hashtable size eg. n = 1234567890, partitions (123, 456, 789, 0)
+reverse the digits of each partition(optional) eg(321, 654, 987, 0)
+sum the partition(321 + 654 + 987 + 1= 1962)
+divide sum by hash table size. eg. h = 11, 1962%11 = 4
+return 4
