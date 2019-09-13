@@ -60,10 +60,20 @@ int main()
         hash_table(nLoadFactor75, hash::mid_square_method),
         hash_table(nLoadFactor75, hash::multiplicative_congruential_method)
     };
+    hash_table hashTLoadFactor100[NUM_HF] = { hash_table(nLoadFactor100, hash::division_method),
+        hash_table(nLoadFactor100, hash::mid_square_method),
+        hash_table(nLoadFactor100, hash::multiplicative_congruential_method)
+    };
+    hash_table hashTLoadFactor200[NUM_HF] = { hash_table(nLoadFactor200, hash::division_method),
+        hash_table(nLoadFactor200, hash::mid_square_method),
+        hash_table(nLoadFactor200, hash::multiplicative_congruential_method)
+    };
     for (int i = 0; i < NUM_HF; ++i) {
         read_csv_data(hashTLoadFactor25[i]);
         read_csv_data(hashTLoadFactor50[i]);
         read_csv_data(hashTLoadFactor75[i]);
+        read_csv_data(hashTLoadFactor100[i]);
+        read_csv_data(hashTLoadFactor200[i]);
     }
 
     // function loop
@@ -73,7 +83,9 @@ int main()
         cout << "(1) LOAD FACTOR 0.25" << endl
             << "(2) LOAD FACTOR 0.5" << endl
             << "(3) LOAD FACTOR 0.75" << endl
-            << "(4) QUIT" << endl
+            << "(4) LOAD FACTOR 1.00" << endl
+            << "(5) LOAD FACTOR 2.00" << endl
+            << "(6) QUIT" << endl
             << "Enter option: ";
         scanf("%d", &choice);
 
@@ -84,14 +96,18 @@ int main()
             break;
         case 3: test_by_load_factor(nLoadFactor75, "0.75", hashTLoadFactor75);
             break;
-        case 4:
+        case 4: test_by_load_factor(nLoadFactor100, "1.00", hashTLoadFactor100);
+            break;
+        case 5: test_by_load_factor(nLoadFactor200, "2.00", hashTLoadFactor200);
+            break;
+        case 6:
             break;
         default:
             cout << "Invalid option" << endl;
             break;
         }
 
-    } while (choice != 4);
+    } while (choice != 6);
 
     return 0;
 }
