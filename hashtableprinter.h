@@ -2,6 +2,7 @@
 #define HASHTABLEPRINTER_H_INCLUDED
 
 #include <iostream>
+#include <map>
 #include "hashtable.h"
 #include "node.h"
 
