@@ -5,8 +5,6 @@
 #include <cstdlib>
 #include <windows.h>
 
-#include <bits/stdc++.h>    // for getting clock/time
-
 #include "hashtable.h"
 #include "hashfunction.h"
 #include "hashtableprinter.h"
@@ -25,6 +23,7 @@ void read_csv_data(hash_table&);
 void test_by_load_factor(int, const char*, hash_table*);
 void create_hashtables();
 void linear_search_worstcase();
+void hash_function_runtimes();
 
 const int numRecords = 121397;
 
@@ -87,7 +86,8 @@ int main()
             << "(4) LOAD FACTOR 1.00" << endl
             << "(5) LOAD FACTOR 2.00" << endl
             << "(6) LINEAR SEARCH (FOR COMPARISON)" << endl
-            << "(7) QUIT" << endl
+            << "(7) HASH FUNCTION RUNTIMES" << endl
+            << "(8) QUIT" << endl
             << "Enter option: ";
         scanf("%d", &choice);
 
@@ -104,14 +104,16 @@ int main()
             break;
         case 6: linear_search_worstcase();
             break;
-        case 7: // quit
+        case 7: hash_function_runtimes();
+            break;
+        case 8: // quit
             break;
         default:
             cout << "Invalid option" << endl;
             break;
         }
 
-    } while (choice != 7);
+    } while (choice != 8);
 
     return 0;
 }
@@ -165,7 +167,7 @@ void test_search(hash_table& hashtable, int keys[]) {
 
     QueryPerformanceFrequency(&freq);
 
-    int iterations = 10000;
+    int iterations = 1;
     double time_taken = 0;
 
     // get average runtime out of 10000 iterations
@@ -242,4 +244,37 @@ void linear_search_worstcase() {
     }
     cout << "==== Average CPU Time ====" << endl;
     cout << "Average worst-case runtime in microseconds: " << time_taken * 1000000 / iterations << endl;
+}
+
+void hash_function_runtimes() {
+
+    cout << "==== Average Runtime of Hash Functions ====" << endl;
+
+    LARGE_INTEGER freq, start, end;
+    QueryPerformanceFrequency(&freq);
+
+    int iterations = 1;
+    int key = 123456;
+    double time_taken = 0;
+    for (int x = 0; x < NUM_HF; ++x) {
+        cout << ">> " << hf_names[x] << endl;
+
+        QueryPerformanceCounter(&start);
+        for (int i = 0; i < iterations; ++i) {
+            switch (x) {
+            case 1: hash::division_method(key, 485587);
+                break;
+            case 2: hash::mid_square_method(key, 485587);
+                break;
+            case 3: hash::multiplicative_congruential_method(key, 485587);
+                break;
+            default:
+                break;
+            }
+        }
+        QueryPerformanceCounter(&end);
+
+        time_taken += (double)(end.QuadPart - start.QuadPart) / freq.QuadPart;
+        cout << "Time Taken in microseconds : " << time_taken * 1000000 / iterations << endl << endl;
+    }
 }
