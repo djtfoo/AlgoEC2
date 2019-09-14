@@ -24,8 +24,9 @@ void test_codes();
 void read_csv_data(hash_table&);
 void test_by_load_factor(int, const char*, hash_table*);
 void create_hashtables();
+void linear_search_worstcase();
 
-//const int numRecords = 121397;
+const int numRecords = 121397;
 
 #define NUM_HF 3    // number of hash functions
 
@@ -85,7 +86,8 @@ int main()
             << "(3) LOAD FACTOR 0.75" << endl
             << "(4) LOAD FACTOR 1.00" << endl
             << "(5) LOAD FACTOR 2.00" << endl
-            << "(6) QUIT" << endl
+            << "(6) LINEAR SEARCH (FOR COMPARISON)" << endl
+            << "(7) QUIT" << endl
             << "Enter option: ";
         scanf("%d", &choice);
 
@@ -100,14 +102,16 @@ int main()
             break;
         case 5: test_by_load_factor(nLoadFactor200, "2.00", hashTLoadFactor200);
             break;
-        case 6:
+        case 6: linear_search_worstcase();
+            break;
+        case 7: // quit
             break;
         default:
             cout << "Invalid option" << endl;
             break;
         }
 
-    } while (choice != 6);
+    } while (choice != 7);
 
     return 0;
 }
@@ -190,4 +194,24 @@ void read_csv_data(hash_table& hashtable) {
     else {
         cout << "Unable to open file" << endl;
     }
+}
+
+void linear_search_worstcase() {
+    int arr[121397];
+
+    LARGE_INTEGER freq, start, end;
+    QueryPerformanceFrequency(&freq);
+    int iterations = 1000;
+    double time_taken = 0;
+    for (int x = 0; x < iterations; x++) {
+        QueryPerformanceCounter(&start);
+        for (int i = 0; i < 121397; ++i) {
+            if (arr[i] == INT_MAX)
+                break;
+        }
+        QueryPerformanceCounter(&end);
+        time_taken += (double)(end.QuadPart - start.QuadPart) / freq.QuadPart;
+    }
+    cout << "==== Average CPU Time ====" << endl;
+    cout << "Average worst-case runtime in microseconds: " << time_taken * 1000000 / iterations << endl;
 }

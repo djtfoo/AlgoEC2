@@ -35,6 +35,7 @@
 		<Unit filename="hashfunction.h" />
 		<Unit filename="hashtable.cpp" />
 		<Unit filename="hashtable.h" />
+		<Unit filename="hashtableprinter.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="node.h" />
 		<Extensions>
