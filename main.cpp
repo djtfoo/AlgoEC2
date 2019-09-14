@@ -17,7 +17,7 @@ using std::string;
 using namespace hash;
 
 // function prototypes
-void test_search(hash_table&, int);
+void test_search(hash_table&, int[]);
 void test_codes();
 
 
@@ -117,24 +117,54 @@ int main()
 }
 
 void test_by_load_factor(int slots, const char* loadfactor, hash_table* hashtables) {
-
-    cout << "Load Factor : " << loadfactor << " | No. of slots : " << slots << endl;
+    cout << "Load Factor : " << loadfactor << " | No. of slots : " << slots << endl << endl;
     cout << "==== Key Distribution ====" << endl;
     for (int i = 0; i < NUM_HF; ++i) {
         cout << ">> " << hf_names[i] << endl;
         hash_table_printer::printKeyDistribution(hashtables[i]);
     }
 
-    cout << "==== Average CPU Time ====" << endl;
-    int key = 418526;
-    cout << "Key Search : " << key << endl;
+    int choice;
+    int successful_keys[10] = {18948, 258360, 329910, 417821, 536832, 618322, 669018, 751352, 807976, 821327};
+    int unsuccessful_keys[10] = {89700, 209283, 349871, 426734, 518637, 579550, 658899, 757789, 807802, 807963};
+    int *keys;
+
+    do {
+        cout << "======================" << endl
+            << "(1) SUCCESSFUL SEARCH" << endl
+            << "(2) UNSUCCESSFUL SEARCH" << endl
+            << "(3) QUIT" << endl
+            << "Enter option: ";
+        scanf("%d", &choice);
+
+        switch (choice) {
+        case 1: keys = successful_keys;
+            break;
+        case 2: keys = unsuccessful_keys;
+            break;
+        case 3:
+            break;
+        default:
+            cout << "Invalid option" << endl;
+            break;
+        }
+    } while (choice < 1 && choice > 3);
+
+    if (choice == 3) return;
+
+    cout << endl << "Key Search: " << endl;
+    for (int i = 0; i < 10; ++i) {
+        cout << keys[i] << " ";
+    }
+    cout << endl << endl << "==== Average CPU Time ====" << endl;
+
     for (int i = 0; i < NUM_HF; ++i) {
-        cout << ">> " << hf_names[i] << endl;
-        test_search(hashtables[i], key);
+        cout << endl << ">> " << hf_names[i] << endl;
+        test_search(hashtables[i], keys);
     }
 }
 
-void test_search(hash_table& hashtable, int key) {
+void test_search(hash_table& hashtable, int keys[]) {
     LARGE_INTEGER freq, start, end;
 
     QueryPerformanceFrequency(&freq);
@@ -145,15 +175,17 @@ void test_search(hash_table& hashtable, int key) {
     // get average runtime out of 10000 iterations
     for (int i = 0; i < iterations; i++) {
         QueryPerformanceCounter(&start);
-        hashtable.get_value(key);
-//        hashtable.find_key(key);
-//        cout << "Key: " << key << endl;
-//        cout << "Value: " << hashtable.get_value(key) << endl;
-//        cout << "Key Comparisons Made: " << hashtable.find_key(key) << endl;
+        for (int j = 0; j < 10; j++) {
+            hashtable.get_value(keys[j]);
+//            hashtable.find_key(key);
+//            cout << "Key: " << key << endl;
+//            cout << "Value: " << hashtable.get_value(key) << endl;
+//            cout << "Key Comparisons Made: " << hashtable.find_key(key) << endl;
+        }
         QueryPerformanceCounter(&end);
         time_taken += (double) (end.QuadPart - start.QuadPart) / freq.QuadPart;
     }
-    cout << "Average runtime in microseconds: " << time_taken*1000000/iterations << endl << endl;
+    cout << "Average runtime of 10 searches in microseconds: " << time_taken*1000000/iterations << endl << endl;
 }
 
 void test_codes() {
