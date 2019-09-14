@@ -10,9 +10,10 @@ namespace hash {
     class hash_table_printer
     {
     public:
-        static void printKeyDistribution(const hash_table& hashtable) {
+        static int printKeyDistribution(const hash_table& hashtable) {
 
             std::map<int, int> counts;
+            int key_comparisons = 0;
 
             for (int i = 0; i < hashtable.tableSize; ++i) {
                 int counter = 0;
@@ -25,10 +26,15 @@ namespace hash {
             }
 
             // print key distribution
-            for (std::map<int, int>::iterator it = counts.begin(); it != counts.end(); ++it)
+            for (std::map<int, int>::iterator it = counts.begin(); it != counts.end(); ++it) {
                 std::cout << "Slots with " << it->first << " keys : " << it->second << std::endl;
+                for (int i = 0; i < it->first; ++i)
+                    key_comparisons += it->first * it->second;
+            }
 
             std::cout << std::endl;
+
+            return key_comparisons;
         }
     };
 }

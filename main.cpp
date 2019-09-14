@@ -121,7 +121,8 @@ void test_by_load_factor(int slots, const char* loadfactor, hash_table* hashtabl
     cout << "==== Key Distribution ====" << endl;
     for (int i = 0; i < NUM_HF; ++i) {
         cout << ">> " << hf_names[i] << endl;
-        hash_table_printer::printKeyDistribution(hashtables[i]);
+        int successful_key_comparisons = hash_table_printer::printKeyDistribution(hashtables[i]);
+        cout << "Average key comparisons: " << (double) successful_key_comparisons/numRecords << endl << endl;
     }
 
     int choice;
@@ -133,7 +134,6 @@ void test_by_load_factor(int slots, const char* loadfactor, hash_table* hashtabl
         cout << "======================" << endl
             << "(1) SUCCESSFUL SEARCH" << endl
             << "(2) UNSUCCESSFUL SEARCH" << endl
-            << "(3) QUIT" << endl
             << "Enter option: ";
         scanf("%d", &choice);
 
@@ -142,15 +142,11 @@ void test_by_load_factor(int slots, const char* loadfactor, hash_table* hashtabl
             break;
         case 2: keys = unsuccessful_keys;
             break;
-        case 3:
-            break;
         default:
             cout << "Invalid option" << endl;
             break;
         }
-    } while (choice < 1 && choice > 3);
-
-    if (choice == 3) return;
+    } while (choice < 1 && choice > 2);
 
     cout << endl << "Key Search: " << endl;
     for (int i = 0; i < 10; ++i) {
