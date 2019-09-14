@@ -17,8 +17,8 @@ namespace hash {
     }
     static int multiplicative_congruential_method(int key, int tableSize) {
         //std::cout<< "Multiplicative Congruential Method" << std::endl;
-        double multiplier = (sqrt(5) - 1)/2;  // reciprocal golden ratio
-        return tableSize * (key*multiplier - floor(key*multiplier));
+        double multiplier = (2.2360679775 - 1)/2;  // reciprocal golden ratio
+        return tableSize * (key*multiplier - (int)(key*multiplier));
     }
 }
 
