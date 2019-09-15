@@ -64,18 +64,18 @@ std::string hash_table::get_value(int key) {
         return "";   // invalid key
     }
 
-    if (buckets[hashedKey] == NULL) {   // key not found
+    /*if (buckets[hashedKey] == NULL) {   // key not found
         return "";  // key not found
+    }*/
+    //else {  // collision; check nodes in bucket
+    node* ptr = buckets[hashedKey];
+    while (ptr != NULL) {
+        if (ptr->key == key)    // key already exists
+            return ptr->value;
+        ptr = ptr->next;
     }
-    else {  // collision; check nodes in bucket
-        node* ptr = buckets[hashedKey];
-        do {
-            if (ptr->key == key)    // key already exists
-                return ptr->value;
-            ptr = ptr->next;
-        } while (ptr != NULL);
-        return "";    // not found in the collision linked list
-    }
+    return "";    // not found in the collision linked list
+    //}
 }
 
 // number of key comparisons made to find the key. if key not found, return -1
@@ -88,20 +88,20 @@ int hash_table::find_key(int key) {
         return -1;   // invalid key
     }
 
-    if (buckets[hashedKey] == NULL) {   // key not found
+    /*if (buckets[hashedKey] == NULL) {   // key not found
         return -1;  // key not found
+    }*/
+    //else {  // collision; check nodes in bucket
+    int keyComp = 0;
+    node* ptr = buckets[hashedKey];
+    while (ptr != NULL) {
+        ++keyComp;
+        if (ptr->key == key)    // key already exists
+            return keyComp;
+        ptr = ptr->next;
     }
-    else {  // collision; check nodes in bucket
-        int keyComp = 0;
-        node* ptr = buckets[hashedKey];
-        do {
-            ++keyComp;
-            if (ptr->key == key)    // key already exists
-                return keyComp;
-            ptr = ptr->next;
-        } while (ptr != NULL);
-        return -1;    // not found in the collision linked list
-    }
+    return -1;    // not found in the collision linked list
+    //}
 }
 
 bool hash_table::set_value(int key, std::string newValue) {

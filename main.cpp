@@ -15,11 +15,11 @@ using std::string;
 using namespace hash;
 
 // function prototypes
-void test_search(hash_table&, int[]);
+void test_search(hash_table&, int[], int);
 void test_codes();
 
-
-void read_csv_data(hash_table&);
+void read_sampled_csv(int*, int, const char*);
+void read_csv_data(hash_table*, int);
 void test_by_load_factor(int, const char*, hash_table*);
 void create_hashtables();
 void linear_search_worstcase();
@@ -34,6 +34,10 @@ const string hf_names[NUM_HF] = {
     "Mid-Square Method",
     "Multiplicative Congruential Method"
 };
+
+const int numSamples = 12000;   // 10% of data
+int sampled_keys[numSamples];
+int unsuccessful_keys[numSamples];
 
 int main()
 {
@@ -68,13 +72,16 @@ int main()
         hash_table(nLoadFactor200, hash::mid_square_method),
         hash_table(nLoadFactor200, hash::multiplicative_congruential_method)
     };
-    for (int i = 0; i < NUM_HF; ++i) {
-        read_csv_data(hashTLoadFactor25[i]);
-        read_csv_data(hashTLoadFactor50[i]);
-        read_csv_data(hashTLoadFactor75[i]);
-        read_csv_data(hashTLoadFactor100[i]);
-        read_csv_data(hashTLoadFactor200[i]);
-    }
+    // read csv data
+    read_csv_data(hashTLoadFactor25, NUM_HF);
+    read_csv_data(hashTLoadFactor50, NUM_HF);
+    read_csv_data(hashTLoadFactor75, NUM_HF);
+    read_csv_data(hashTLoadFactor100, NUM_HF);
+    read_csv_data(hashTLoadFactor200, NUM_HF);
+
+    // read sampled data subset
+    read_sampled_csv(sampled_keys, numSamples, "sample12000.csv");
+    read_sampled_csv(unsuccessful_keys, numSamples, "unsuccessful.csv");
 
     // function loop
     cout << "== CLOSED ADDRESS HASHING COMPARISON PROGRAM ==" << endl;
@@ -128,8 +135,8 @@ void test_by_load_factor(int slots, const char* loadfactor, hash_table* hashtabl
     }
 
     int choice;
-    int successful_keys[10] = {18948, 258360, 329910, 417821, 536832, 618322, 669018, 751352, 807976, 821327};
-    int unsuccessful_keys[10] = {89700, 209283, 349871, 426734, 518637, 579550, 658899, 757789, 807802, 807963};
+    //int successful_keys[10] = {18948, 258360, 329910, 417821, 536832, 618322, 669018, 751352, 807976, 821327};
+    //int unsuccessful_keys[10] = {89700, 209283, 349871, 426734, 518637, 579550, 658899, 757789, 807802, 807963};
     int *keys;
 
     do {
@@ -140,7 +147,7 @@ void test_by_load_factor(int slots, const char* loadfactor, hash_table* hashtabl
         scanf("%d", &choice);
 
         switch (choice) {
-        case 1: keys = successful_keys;
+        case 1: keys = sampled_keys;
             break;
         case 2: keys = unsuccessful_keys;
             break;
@@ -150,30 +157,32 @@ void test_by_load_factor(int slots, const char* loadfactor, hash_table* hashtabl
         }
     } while (choice < 1 && choice > 2);
 
-    cout << endl << "Key Search: " << endl;
-    for (int i = 0; i < 10; ++i) {
-        cout << keys[i] << " ";
-    }
-    cout << endl << endl << "==== Average CPU Time ====" << endl;
+    cout << endl << "Key Search: " << numSamples << " records" << endl;
+    //for (int i = 0; i < 10; ++i) {
+    //    cout << keys[i] << " ";
+    //}
+    cout << endl << "==== Average CPU Time ====" << endl;
 
     for (int i = 0; i < NUM_HF; ++i) {
         cout << endl << ">> " << hf_names[i] << endl;
-        test_search(hashtables[i], keys);
+        test_search(hashtables[i], keys, numSamples);
     }
 }
 
-void test_search(hash_table& hashtable, int keys[]) {
+void test_search(hash_table& hashtable, int keys[], int keysSize) {
     LARGE_INTEGER freq, start, end;
 
     QueryPerformanceFrequency(&freq);
 
-    int iterations = 1;
+    int iterations = 100;
     double time_taken = 0;
+
+    cout << "Number of keys : " << keysSize <<endl;
 
     // get average runtime out of 10000 iterations
     for (int i = 0; i < iterations; i++) {
         QueryPerformanceCounter(&start);
-        for (int j = 0; j < 10; j++) {
+        for (int j = 0; j < keysSize; j++) {
             hashtable.get_value(keys[j]);
 //            hashtable.find_key(key);
 //            cout << "Key: " << key << endl;
@@ -183,7 +192,9 @@ void test_search(hash_table& hashtable, int keys[]) {
         QueryPerformanceCounter(&end);
         time_taken += (double) (end.QuadPart - start.QuadPart) / freq.QuadPart;
     }
-    cout << "Average runtime of 10 searches in microseconds: " << time_taken*1000000/iterations << endl << endl;
+    int unitSize = 10;
+    double unitSizePerKeysSize = (double)unitSize / keysSize;
+    cout << "Average runtime of 10 searches in microseconds: " << (time_taken*1000000)/iterations*unitSizePerKeysSize << endl << endl;
 }
 
 void test_codes() {
@@ -204,7 +215,7 @@ void test_codes() {
         cout << "Key: 8  Value: (Not found)" << endl;
 }
 
-void read_csv_data(hash_table& hashtable) {
+void read_csv_data(hash_table* hashtables, int n) {
 
     // read file
     std::ifstream csvfile("csvdata_searchval.csv");
@@ -217,7 +228,9 @@ void read_csv_data(hash_table& hashtable) {
             std::getline(ss, token, ',');   // token = postal code
             int postalCode = std::atoi(token.c_str());
             std::getline(ss, token, ',');   // token = street/building name
-            hashtable.insert_element(postalCode, token);
+            for (int i = 0; i < n; ++i) {
+                hashtables[i].insert_element(postalCode, token);
+            }
         }
         csvfile.close();
     }
@@ -253,7 +266,7 @@ void hash_function_runtimes() {
     LARGE_INTEGER freq, start, end;
     QueryPerformanceFrequency(&freq);
 
-    int iterations = 1;
+    int iterations = 10000;
     int key = 123456;
     double time_taken = 0;
     for (int x = 0; x < NUM_HF; ++x) {
@@ -276,5 +289,28 @@ void hash_function_runtimes() {
 
         time_taken += (double)(end.QuadPart - start.QuadPart) / freq.QuadPart;
         cout << "Time Taken in microseconds : " << time_taken * 1000000 / iterations << endl << endl;
+    }
+}
+
+void read_sampled_csv(int* arr, int n, const char* filepath) {
+
+    // read file
+    std::ifstream csvfile(filepath);
+    if (csvfile.is_open()) {
+        string line; // to store each line from the CSV
+        while (getline(csvfile, line))
+        {
+            std::stringstream ss(line);
+            string token;
+            std::getline(ss, token, ',');   // token = postal code
+            int postalCode = std::atoi(token.c_str());
+            for (int i = 0; i < n; ++i) {
+                arr[i] = postalCode;
+            }
+        }
+        csvfile.close();
+    }
+    else {
+        cout << "Unable to open file" << endl;
     }
 }
