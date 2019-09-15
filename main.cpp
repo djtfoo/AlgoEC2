@@ -16,7 +16,7 @@ using namespace hash;
 
 // function prototypes
 void test_search(hash_table&, int[], int);
-void test_codes();
+void hash_demo();
 
 void read_sampled_csv(int*, int, const char*);
 void read_csv_data(hash_table*, int);
@@ -39,18 +39,18 @@ const int numSamples = 12000;   // 10% of data
 int sampled_keys[numSamples];
 int unsuccessful_keys[numSamples];
 
+const int nLoadFactor25 = 485587;
+const int nLoadFactor50 = 242797;
+const int nLoadFactor75 = 161869;
+const int nLoadFactor100 = 121403;
+const int nLoadFactor200 = 60703;
+
 int main()
 {
     // ==== TESTING ====
-    //test_codes();   // test codes for testing out the hash table
+    //hash_demo();   // test codes for testing out the hash table
 
     // ==== ACTUAL APPLICATION ====
-    int nLoadFactor25 = 485587;
-    int nLoadFactor50 = 242797;
-    int nLoadFactor75 = 161869;
-    int nLoadFactor100 = 121403;
-    int nLoadFactor200 = 60703;
-
     // Create hash tables
     hash_table hashTLoadFactor25[NUM_HF] = { hash_table(nLoadFactor25, hash::division_method),
         hash_table(nLoadFactor25, hash::mid_square_method),
@@ -87,14 +87,16 @@ int main()
     cout << "== CLOSED ADDRESS HASHING COMPARISON PROGRAM ==" << endl;
     int choice;
     do {
-        cout << "(1) LOAD FACTOR 0.25" << endl
+        cout
+            << "(1) LOAD FACTOR 0.25" << endl
             << "(2) LOAD FACTOR 0.5" << endl
             << "(3) LOAD FACTOR 0.75" << endl
             << "(4) LOAD FACTOR 1.00" << endl
             << "(5) LOAD FACTOR 2.00" << endl
             << "(6) LINEAR SEARCH (FOR COMPARISON)" << endl
             << "(7) HASH FUNCTION RUNTIMES" << endl
-            << "(8) QUIT" << endl
+            << "(8) HASH TABLE DEMO" << endl
+            << "(9) QUIT" << endl
             << "Enter option: ";
         scanf("%d", &choice);
 
@@ -113,14 +115,16 @@ int main()
             break;
         case 7: hash_function_runtimes();
             break;
-        case 8: // quit
+        case 8: hash_demo();
+            break;
+        case 9: // quit
             break;
         default:
             cout << "Invalid option" << endl;
             break;
         }
 
-    } while (choice != 8);
+    } while (choice != 9);
 
     return 0;
 }
@@ -174,7 +178,7 @@ void test_search(hash_table& hashtable, int keys[], int keysSize) {
 
     QueryPerformanceFrequency(&freq);
 
-    int iterations = 100;
+    int iterations = 1;
     double time_taken = 0;
 
     cout << "Number of keys : " << keysSize <<endl;
@@ -183,7 +187,7 @@ void test_search(hash_table& hashtable, int keys[], int keysSize) {
     for (int i = 0; i < iterations; i++) {
         QueryPerformanceCounter(&start);
         for (int j = 0; j < keysSize; j++) {
-            hashtable.get_value(keys[j]);
+            hashtable.find_key(keys[j]);
 //            hashtable.find_key(key);
 //            cout << "Key: " << key << endl;
 //            cout << "Value: " << hashtable.get_value(key) << endl;
@@ -194,16 +198,110 @@ void test_search(hash_table& hashtable, int keys[], int keysSize) {
     }
     int unitSize = 10;
     double unitSizePerKeysSize = (double)unitSize / keysSize;
-    cout << "Average runtime of 10 searches in microseconds: " << (time_taken*1000000)/iterations*unitSizePerKeysSize << endl << endl;
+    time_taken = time_taken*(1000000/iterations);
+    cout << "Average runtime of 10 searches in microseconds: " << time_taken*unitSizePerKeysSize << endl << endl;
 }
 
-void test_codes() {
+void hash_demo() {
 
     // create hash table
-    hash_table hashtable(5, hash::division_method);
+    hash_table *hashtable;
+    int bucketSize = 0;
+
+    cout << "==== HASH TABLE DEMO ====" << endl;
+    // select load factor
+    cout << ">>Select Load Factor" << endl;
+    cout << "(1) Load Factor 0.25" << endl
+        << "(2) Load Factor 0.5" << endl
+        << "(3) Load Factor 0.75" << endl
+        << "(4) Load Factor 1.00" << endl
+        << "(5) Load Factor 2.00" << endl;
+    cout << "Enter option: ";
+    int choice;
+    scanf("%d", &choice);
+    switch (choice) {
+    case 1: bucketSize = nLoadFactor25;
+        break;
+    case 2: bucketSize = nLoadFactor50;
+        break;
+    case 3: bucketSize = nLoadFactor75;
+        break;
+    case 4: bucketSize = nLoadFactor100;
+        break;
+    case 5: bucketSize = nLoadFactor200;
+        break;
+    default:
+        break;
+    }
+
+    // select hash function
+    cout << endl << ">>Select Hash Function" << endl;
+    cout << "(1) " << hf_names[0] << endl
+        << "(2) " << hf_names[1] << endl
+        << "(3) " << hf_names[2] << endl;
+    cout << "Enter option: ";
+    scanf("%d", &choice);
+    switch (choice) {
+    case 1: hashtable = new hash_table(bucketSize, hash::division_method);
+        break;
+    case 2: hashtable = new hash_table(bucketSize, hash::mid_square_method);
+        break;
+    case 3: hashtable = new hash_table(bucketSize, hash::multiplicative_congruential_method);
+        break;
+    default:
+        break;
+    }
+    read_csv_data(hashtable, 1);
+    cout << "Hash Table created!" << endl;
+
+    // test out key searches
+    do {
+        cout << endl
+            << "(1) Find Key" << endl
+            << "(2) Quit" << endl;
+        cout << "Enter option: ";
+        scanf("%d", &choice);
+        switch (choice) {
+        case 1:
+        {
+            int key;
+            cout << "Enter target key: ";
+            scanf("%d", &key);
+
+            LARGE_INTEGER freq, start, end;
+            QueryPerformanceFrequency(&freq);
+            QueryPerformanceCounter(&start);
+            int numComparisons;
+            for (int i = 0; i < 10; ++i) {
+            numComparisons = hashtable->find_key(key);
+            }
+            QueryPerformanceCounter(&end);
+            double time_taken = (double)(end.QuadPart - start.QuadPart) / freq.QuadPart;
+
+            if (numComparisons == -1) { // error in hash function
+                cout << "Hash function error" << endl;
+            }
+            else if (numComparisons == 0) { // key not found
+                cout << "Key not found" << endl;
+            }
+            else {
+                cout << "Key found! Number of Key Comparisons Made: " << numComparisons << endl;
+                cout << "Value: " << hashtable->get_value(key) << endl;
+            }
+            cout << "Runtime (in microseconds): " << time_taken * 1000000 << endl;
+        }
+            break;
+        case 2: // quit
+            break;
+        default: cout << "Invalid option" << endl;
+            break;
+        }
+    } while (choice != 2);
+
+    delete hashtable;
 
     // test insert & set value
-    cout << hashtable.insert_element(7, "500") << endl;    // prints 1
+    /*cout << hashtable.insert_element(7, "500") << endl;    // prints 1
     cout << hashtable.insert_element(2, "500") << endl;    // prints 1, but there will be collision in the hash table's slots
     cout << hashtable.insert_element(7, "555") << endl;    // prints 0; duplicate key
     cout << hashtable.set_value(7, "599") << endl;    // prints 1; new value set
@@ -212,7 +310,7 @@ void test_codes() {
     cout << "Key: 7  Value: " << hashtable.get_value(7) << endl;
     cout << "Key: 2  Value: " << hashtable.get_value(2) << endl;
     if (hashtable.get_value(8) == "")
-        cout << "Key: 8  Value: (Not found)" << endl;
+        cout << "Key: 8  Value: (Not found)" << endl;*/
 }
 
 void read_csv_data(hash_table* hashtables, int n) {
@@ -240,11 +338,11 @@ void read_csv_data(hash_table* hashtables, int n) {
 }
 
 void linear_search_worstcase() {
-    int arr[121397];
+    int arr[121397] = {0};
 
     LARGE_INTEGER freq, start, end;
     QueryPerformanceFrequency(&freq);
-    int iterations = 1000;
+    int iterations = 100;
     double time_taken = 0;
     for (int x = 0; x < iterations; x++) {
         QueryPerformanceCounter(&start);
