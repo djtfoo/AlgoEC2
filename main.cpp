@@ -406,7 +406,7 @@ void read_csv_data(hash_table** hashtables, int n) {
 }
 
 void linear_search_worstcase() {
-    int arr[1213970] = {0};
+    int arr[121397] = {0};
 
     LARGE_INTEGER freq, start, end;
     QueryPerformanceFrequency(&freq);
@@ -414,7 +414,7 @@ void linear_search_worstcase() {
     double time_taken = 0;
     for (int x = 0; x < iterations; x++) {
         QueryPerformanceCounter(&start);
-        for (int i = 0; i < 1213970; ++i) {
+        for (int i = 0; i < 121397; ++i) {
             if (arr[i] == INT_MAX)
                 break;
         }
