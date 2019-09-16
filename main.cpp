@@ -257,8 +257,7 @@ void test_search(hash_table& hashtable, int keys[], int keysSize) {
     }
     int unitSize = 10;
     double unitSizePerKeysSize = (double)unitSize / keysSize;
-    time_taken = time_taken;
-    cout << "Average runtime of 10 searches in microseconds: " << time_taken*(1000000/iterations)*unitSizePerKeysSize << endl << endl;
+    cout << "Average runtime of " << unitSize << " searches in microseconds: " << time_taken*(1000000/iterations)*unitSizePerKeysSize << endl << endl;
 }
 
 void hash_demo() {
@@ -397,7 +396,7 @@ void read_csv_data(hash_table** hashtables, int n) {
 }
 
 void linear_search_worstcase() {
-    int arr[121397] = {0};
+    int arr[1213970] = {0};
 
     LARGE_INTEGER freq, start, end;
     QueryPerformanceFrequency(&freq);
@@ -405,7 +404,7 @@ void linear_search_worstcase() {
     double time_taken = 0;
     for (int x = 0; x < iterations; x++) {
         QueryPerformanceCounter(&start);
-        for (int i = 0; i < 121397; ++i) {
+        for (int i = 0; i < 1213970; ++i) {
             if (arr[i] == INT_MAX)
                 break;
         }
