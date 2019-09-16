@@ -14,6 +14,7 @@ namespace hash {
         //std::cout<< "Folding Method" << std::endl;
         unsigned long long keySquared = key * key / 1000;
         return (keySquared % 1000000) % tableSize;
+        //return (keySquared >> log2(tableSize)/2) % tableSize; // attempt at power of 2 table size
     }
     static int multiplicative_congruential_method(int key, int tableSize) {
         //std::cout<< "Multiplicative Congruential Method" << std::endl;

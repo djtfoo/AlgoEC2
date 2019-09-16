@@ -19,9 +19,9 @@ void test_search(hash_table&, int[], int);
 void hash_demo();
 
 void read_sampled_csv(int*, int, const char*);
-void read_csv_data(hash_table*, int);
-void test_by_load_factor(int, const char*, hash_table*);
-void create_hashtables();
+void read_csv_data(hash_table**, int);
+void test_by_load_factor(int, const char*, hash_table**);
+void create_hashtables(hash_table**, int);
 void linear_search_worstcase();
 void hash_function_runtimes();
 
@@ -39,11 +39,43 @@ const int numSamples = 12000;   // 10% of data
 int sampled_keys[numSamples];
 int unsuccessful_keys[numSamples];
 
-const int nLoadFactor25 = 485587;
+/*const int nLoadFactor25 = 485587;
 const int nLoadFactor50 = 242797;
 const int nLoadFactor75 = 161869;
 const int nLoadFactor100 = 121403;
-const int nLoadFactor200 = 60703;
+const int nLoadFactor200 = 60703;//262144;//200000;//50000;//100000;//65536;
+//const int power2_16 = 65536;
+*/
+
+int tableSizesPrime[5] = {
+    485587, // around 0.25
+    242797, // around 0.5
+    161869, // around 0.75
+    121403, // around 1.00
+    60703   // around 2.00
+};
+
+int tableSizes10Multiples[5] = {
+    486000, // around 0.25
+    243000, // around 0.5
+    162000, // around 0.75
+    121000, // around 1.00
+    60700   // around 2.00
+};
+
+int tableSizesBase2[5] = {
+
+};
+
+int tableSizesExact[5] = {
+    numRecords / 0.25,
+    numRecords / 0.5,
+    numRecords / 0.75,
+    numRecords,
+    numRecords / 2
+};
+
+int *tableSizes;
 
 int main()
 {
@@ -52,7 +84,7 @@ int main()
 
     // ==== ACTUAL APPLICATION ====
     // Create hash tables
-    hash_table hashTLoadFactor25[NUM_HF] = { hash_table(nLoadFactor25, hash::division_method),
+    /*hash_table hashTLoadFactor25[NUM_HF] = { hash_table(nLoadFactor25, hash::division_method),
         hash_table(nLoadFactor25, hash::mid_square_method),
         hash_table(nLoadFactor25, hash::multiplicative_congruential_method)
     };
@@ -77,64 +109,91 @@ int main()
     read_csv_data(hashTLoadFactor50, NUM_HF);
     read_csv_data(hashTLoadFactor75, NUM_HF);
     read_csv_data(hashTLoadFactor100, NUM_HF);
-    read_csv_data(hashTLoadFactor200, NUM_HF);
+    read_csv_data(hashTLoadFactor200, NUM_HF);*/
 
     // read sampled data subset
     read_sampled_csv(sampled_keys, numSamples, "sample12000.csv");
     read_sampled_csv(unsuccessful_keys, numSamples, "unsuccessful.csv");
 
+    cout << log2(65536)/2;
+
+    // array of hash_table pointers
+    hash_table** hash_tables = new hash_table*[NUM_HF]();
+    tableSizes = &tableSizesPrime[0];
+
     // function loop
     cout << "== CLOSED ADDRESS HASHING COMPARISON PROGRAM ==" << endl;
     int choice;
     do {
-        cout
-            << "(1) LOAD FACTOR 0.25" << endl
+        cout << "(1) LOAD FACTOR 0.25" << endl
             << "(2) LOAD FACTOR 0.5" << endl
             << "(3) LOAD FACTOR 0.75" << endl
             << "(4) LOAD FACTOR 1.00" << endl
             << "(5) LOAD FACTOR 2.00" << endl
-            << "(6) LINEAR SEARCH (FOR COMPARISON)" << endl
-            << "(7) HASH FUNCTION RUNTIMES" << endl
-            << "(8) HASH TABLE DEMO" << endl
-            << "(9) QUIT" << endl
+            << "(6) SET TABLE SIZES TO PRIME NUMBERS" << endl
+            << "(7) SET TABLE SIZES TO MULTIPLES OF 10" << endl
+            << "(8) SET TABLE SIZES TO EXACT" << endl
+            << "(9) LINEAR SEARCH (FOR COMPARISON)" << endl
+            << "(10) HASH FUNCTION RUNTIMES" << endl
+            << "(11) HASH TABLE DEMO" << endl
+            << "(12) QUIT" << endl
             << "Enter option: ";
         scanf("%d", &choice);
 
         switch (choice) {
-        case 1: test_by_load_factor(nLoadFactor25, "0.25", hashTLoadFactor25);
+        case 1: create_hashtables(hash_tables, tableSizes[0]);
+            test_by_load_factor(tableSizes[0], "0.25", hash_tables);
             break;
-        case 2: test_by_load_factor(nLoadFactor50, "0.5", hashTLoadFactor50);
+        case 2: create_hashtables(hash_tables, tableSizes[1]);
+            test_by_load_factor(tableSizes[1], "0.5", hash_tables);
             break;
-        case 3: test_by_load_factor(nLoadFactor75, "0.75", hashTLoadFactor75);
+        case 3: create_hashtables(hash_tables, tableSizes[2]);
+            test_by_load_factor(tableSizes[2], "0.75", hash_tables);
             break;
-        case 4: test_by_load_factor(nLoadFactor100, "1.00", hashTLoadFactor100);
+        case 4: create_hashtables(hash_tables, tableSizes[3]);
+            test_by_load_factor(tableSizes[3], "1.00", hash_tables);
             break;
-        case 5: test_by_load_factor(nLoadFactor200, "2.00", hashTLoadFactor200);
+        case 5: create_hashtables(hash_tables, tableSizes[4]);
+            test_by_load_factor(tableSizes[4], "2.00", hash_tables);
             break;
-        case 6: linear_search_worstcase();
+        case 6: tableSizes = &tableSizesPrime[0];
+            cout << "Table sizes set to prime numbers" << endl << endl;
             break;
-        case 7: hash_function_runtimes();
+        case 7: tableSizes = &tableSizes10Multiples[0];
+            cout << "Table sizes set to multiples of 10" << endl << endl;
             break;
-        case 8: hash_demo();
+        case 8: tableSizes = &tableSizesExact[0];
+            cout << "Table sizes set to exact" << endl << endl;
             break;
-        case 9: // quit
+        case 9: linear_search_worstcase();
+            break;
+        case 10: hash_function_runtimes();
+            break;
+        case 11: hash_demo();
+            break;
+        case 12: // quit
             break;
         default:
             cout << "Invalid option" << endl;
             break;
         }
 
-    } while (choice != 9);
+    } while (choice != 12);
+
+    delete hash_tables[0];
+    delete hash_tables[1];
+    delete hash_tables[2];
+    delete[] hash_tables;
 
     return 0;
 }
 
-void test_by_load_factor(int slots, const char* loadfactor, hash_table* hashtables) {
+void test_by_load_factor(int slots, const char* loadfactor, hash_table** hashtables) {
     cout << "Load Factor : " << loadfactor << " | No. of slots : " << slots << endl << endl;
     cout << "==== Key Distribution ====" << endl;
     for (int i = 0; i < NUM_HF; ++i) {
         cout << ">> " << hf_names[i] << endl;
-        int successful_key_comparisons = hash_table_printer::printKeyDistribution(hashtables[i]);
+        int successful_key_comparisons = hash_table_printer::printKeyDistribution(*(hashtables[i]));
         cout << "Average key comparisons: " << (double) successful_key_comparisons/numRecords << endl << endl;
     }
 
@@ -169,7 +228,7 @@ void test_by_load_factor(int slots, const char* loadfactor, hash_table* hashtabl
 
     for (int i = 0; i < NUM_HF; ++i) {
         cout << endl << ">> " << hf_names[i] << endl;
-        test_search(hashtables[i], keys, numSamples);
+        test_search(*(hashtables[i]), keys, numSamples);
     }
 }
 
@@ -198,8 +257,8 @@ void test_search(hash_table& hashtable, int keys[], int keysSize) {
     }
     int unitSize = 10;
     double unitSizePerKeysSize = (double)unitSize / keysSize;
-    time_taken = time_taken*(1000000/iterations);
-    cout << "Average runtime of 10 searches in microseconds: " << time_taken*unitSizePerKeysSize << endl << endl;
+    time_taken = time_taken;
+    cout << "Average runtime of 10 searches in microseconds: " << time_taken*(1000000/iterations)*unitSizePerKeysSize << endl << endl;
 }
 
 void hash_demo() {
@@ -220,15 +279,15 @@ void hash_demo() {
     int choice;
     scanf("%d", &choice);
     switch (choice) {
-    case 1: bucketSize = nLoadFactor25;
+    case 1: bucketSize = tableSizes[0];
         break;
-    case 2: bucketSize = nLoadFactor50;
+    case 2: bucketSize = tableSizes[1];
         break;
-    case 3: bucketSize = nLoadFactor75;
+    case 3: bucketSize = tableSizes[2];
         break;
-    case 4: bucketSize = nLoadFactor100;
+    case 4: bucketSize = tableSizes[3];
         break;
-    case 5: bucketSize = nLoadFactor200;
+    case 5: bucketSize = tableSizes[4];
         break;
     default:
         break;
@@ -251,7 +310,7 @@ void hash_demo() {
     default:
         break;
     }
-    read_csv_data(hashtable, 1);
+    //read_csv_data(&hashtable, 1);
     cout << "Hash Table created!" << endl;
 
     // test out key searches
@@ -273,7 +332,7 @@ void hash_demo() {
             QueryPerformanceCounter(&start);
             int numComparisons;
             for (int i = 0; i < 10; ++i) {
-            numComparisons = hashtable->find_key(key);
+                numComparisons = hashtable->find_key(key);
             }
             QueryPerformanceCounter(&end);
             double time_taken = (double)(end.QuadPart - start.QuadPart) / freq.QuadPart;
@@ -288,7 +347,7 @@ void hash_demo() {
                 cout << "Key found! Number of Key Comparisons Made: " << numComparisons << endl;
                 cout << "Value: " << hashtable->get_value(key) << endl;
             }
-            cout << "Runtime (in microseconds): " << time_taken * 1000000 << endl;
+            cout << "Runtime (in microseconds): " << time_taken * (1000000/10) << endl;
         }
             break;
         case 2: // quit
@@ -313,7 +372,7 @@ void hash_demo() {
         cout << "Key: 8  Value: (Not found)" << endl;*/
 }
 
-void read_csv_data(hash_table* hashtables, int n) {
+void read_csv_data(hash_table** hashtables, int n) {
 
     // read file
     std::ifstream csvfile("csvdata_searchval.csv");
@@ -327,7 +386,7 @@ void read_csv_data(hash_table* hashtables, int n) {
             int postalCode = std::atoi(token.c_str());
             std::getline(ss, token, ',');   // token = street/building name
             for (int i = 0; i < n; ++i) {
-                hashtables[i].insert_element(postalCode, token);
+                hashtables[i]->insert_element(postalCode, token);
             }
         }
         csvfile.close();
@@ -411,4 +470,20 @@ void read_sampled_csv(int* arr, int n, const char* filepath) {
     else {
         cout << "Unable to open file" << endl;
     }
+}
+
+void create_hashtables(hash_table** hash_tables, int tableSize) {
+
+    if (hash_tables[0] != NULL) {
+
+        delete hash_tables[0];
+        delete hash_tables[1];
+        delete hash_tables[2];
+    }
+
+    hash_tables[0] = new hash_table(tableSize, hash::division_method);
+    hash_tables[1] = new hash_table(tableSize, hash::mid_square_method);
+    hash_tables[2] = new hash_table(tableSize, hash::multiplicative_congruential_method);
+
+    read_csv_data(hash_tables, NUM_HF);
 }
