@@ -63,9 +63,9 @@ int tableSizes10Multiples[5] = {
     60700   // around 2.00
 };
 
-int tableSizesBase2[5] = {
+/*int tableSizesBase2[5] = {
 
-};
+};*/
 
 int tableSizesExact[5] = {
     numRecords / 0.25,
@@ -221,7 +221,7 @@ void test_by_load_factor(int slots, const char* loadfactor, hash_table** hashtab
         }
     } while (choice < 1 && choice > 2);
 
-    cout << endl << "Key Search: " << numSamples << " records" << endl;
+    //cout << endl << "Key Search: " << numSamples << " records" << endl;
     //for (int i = 0; i < 10; ++i) {
     //    cout << keys[i] << " ";
     //}
@@ -246,10 +246,14 @@ void test_search(hash_table& hashtable, int keys[], int keysSize) {
 
     cout << "Number of keys : " << keysSize <<endl;
 
-    // get average runtime out of 10000 iterations
+    //int numKeyComp = 0;
+
+    // get average runtime out of number of iterations
     for (int i = 0; i < iterations; i++) {
         QueryPerformanceCounter(&start);
         for (int j = 0; j < keysSize; j++) {
+            //int keycomp = hashtable.find_key(keys[j]);
+            //numKeyComp +=keycomp;
             hashtable.find_key(keys[j]);
 //            hashtable.find_key(key);
 //            cout << "Key: " << key << endl;
@@ -259,9 +263,11 @@ void test_search(hash_table& hashtable, int keys[], int keysSize) {
         QueryPerformanceCounter(&end);
         time_taken += (double) (end.QuadPart - start.QuadPart) / freq.QuadPart;
     }
+    //float numComps = (float)numKeyComp/ (float)keysSize;
     int unitSize = 10;
     double unitSizePerKeysSize = (double)unitSize / keysSize;
-    cout << "Average runtime of " << unitSize << " searches in microseconds: " << time_taken*(1000000/iterations)*unitSizePerKeysSize << endl << endl;
+    cout << "Average runtime of " << unitSize << " searches in microseconds: " << time_taken*(1000000/iterations)*unitSizePerKeysSize << endl;
+    //cout << "Number of key comp: " << numComps << endl << endl;
 }
 
 void hash_demo() {
@@ -313,7 +319,7 @@ void hash_demo() {
     default:
         break;
     }
-    //read_csv_data(&hashtable, 1);
+    read_csv_data(&hashtable, 1);
     cout << "Hash Table created!" << endl;
 
     // test out key searches
@@ -458,15 +464,14 @@ void read_sampled_csv(int* arr, int n, const char* filepath) {
     std::ifstream csvfile(filepath);
     if (csvfile.is_open()) {
         string line; // to store each line from the CSV
+        int i = 0;
         while (getline(csvfile, line))
         {
             std::stringstream ss(line);
             string token;
             std::getline(ss, token, ',');   // token = postal code
             int postalCode = std::atoi(token.c_str());
-            for (int i = 0; i < n; ++i) {
-                arr[i] = postalCode;
-            }
+            arr[i++] = postalCode;
         }
         csvfile.close();
     }

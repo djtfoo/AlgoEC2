@@ -28,8 +28,8 @@ namespace hash {
             // print key distribution
             for (std::map<int, int>::iterator it = counts.begin(); it != counts.end(); ++it) {
                 std::cout << "Slots with " << it->first << " keys : " << it->second << std::endl;
-                for (int i = 0; i < it->first; ++i)
-                    key_comparisons += it->first * it->second;
+                for (int i = 1; i <= it->first; ++i)
+                    key_comparisons += i * it->second;
             }
 
             std::cout << std::endl;
