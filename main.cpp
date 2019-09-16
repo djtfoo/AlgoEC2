@@ -36,7 +36,7 @@ const string hf_names[NUM_HF] = {
 };
 
 const int numSamples = 12000;   // 10% of data
-int sampled_keys[numRecords];
+int sampled_keys[numSamples];
 int unsuccessful_keys[numSamples];
 
 /*const int nLoadFactor25 = 485587;
@@ -112,8 +112,8 @@ int main()
     read_csv_data(hashTLoadFactor200, NUM_HF);*/
 
     // read sampled data subset
-    //read_sampled_csv(sampled_keys, numSamples, "sample12000.csv");
-    read_sampled_csv(sampled_keys, numRecords, "csvdata_searchval.csv");
+    read_sampled_csv(sampled_keys, numSamples, "sample12000.csv");
+    //read_sampled_csv(sampled_keys, numRecords, "csvdata_searchval.csv");
     read_sampled_csv(unsuccessful_keys, numSamples, "unsuccessful.csv");
 
     cout << log2(65536)/2;
@@ -229,10 +229,10 @@ void test_by_load_factor(int slots, const char* loadfactor, hash_table** hashtab
 
     for (int i = 0; i < NUM_HF; ++i) {
         cout << endl << ">> " << hf_names[i] << endl;
-        if (choice == 1)
-            test_search(*(hashtables[i]), keys, numRecords);
-        else // (choice == 2)
-            test_search(*(hashtables[i]), keys, numSamples);
+        //if (choice == 1)
+        test_search(*(hashtables[i]), keys, numSamples);
+        //else // (choice == 2)
+        //    test_search(*(hashtables[i]), keys, numSamples);
     }
 }
 
@@ -249,9 +249,9 @@ void test_search(hash_table& hashtable, int keys[], int keysSize) {
     //int numKeyComp = 0;
 
     // get average runtime out of number of iterations
-    for (int i = 0; i < iterations; i++) {
+    for (int i = 0; i < iterations; ++i) {
         QueryPerformanceCounter(&start);
-        for (int j = 0; j < keysSize; j++) {
+        for (int j = 0; j < keysSize; ++j) {
             //int keycomp = hashtable.find_key(keys[j]);
             //numKeyComp +=keycomp;
             hashtable.find_key(keys[j]);
