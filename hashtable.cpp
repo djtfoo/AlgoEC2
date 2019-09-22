@@ -100,7 +100,7 @@ int hash_table::find_key(int key) {
             return keyComp;
         ptr = ptr->next;
     }
-    return 0;   // not found in the collision linked list
+    return keyComp;   // not found in the collision linked list
     //}
 }
 

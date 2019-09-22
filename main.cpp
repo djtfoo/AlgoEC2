@@ -116,8 +116,6 @@ int main()
     //read_sampled_csv(sampled_keys, numRecords, "csvdata_searchval.csv");
     read_sampled_csv(unsuccessful_keys, numSamples, "unsuccessful.csv");
 
-    cout << log2(65536)/2;
-
     // array of hash_table pointers
     hash_table** hash_tables = new hash_table*[NUM_HF]();
     tableSizes = &tableSizesPrime[0];
@@ -264,9 +262,9 @@ void test_search(hash_table& hashtable, int keys[], int keysSize) {
         time_taken += (double) (end.QuadPart - start.QuadPart) / freq.QuadPart;
     }
     //float numComps = (float)numKeyComp/ (float)keysSize;
-    int unitSize = 10;
+    int unitSize = 1;
     double unitSizePerKeysSize = (double)unitSize / keysSize;
-    cout << "Average runtime of " << unitSize << " searches in microseconds: " << time_taken*(1000000/iterations)*unitSizePerKeysSize << endl;
+    cout << "Average runtime of 1 search in microseconds: " << time_taken*(1000000/iterations)*unitSizePerKeysSize << endl;
     //cout << "Number of key comp: " << numComps << endl << endl;
 }
 
@@ -340,7 +338,8 @@ void hash_demo() {
             QueryPerformanceFrequency(&freq);
             QueryPerformanceCounter(&start);
             int numComparisons;
-            for (int i = 0; i < 10; ++i) {
+            int iterations = 10;
+            for (int i = 0; i < iterations; ++i) {
                 numComparisons = hashtable->find_key(key);
             }
             QueryPerformanceCounter(&end);
@@ -356,7 +355,7 @@ void hash_demo() {
                 cout << "Key found! Number of Key Comparisons Made: " << numComparisons << endl;
                 cout << "Value: " << hashtable->get_value(key) << endl;
             }
-            cout << "Runtime (in microseconds): " << time_taken * (1000000/10) << endl;
+            cout << "Runtime (in microseconds): " << time_taken * (1000000/iterations) << endl;
         }
             break;
         case 2: // quit
